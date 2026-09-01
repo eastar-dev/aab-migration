@@ -250,11 +250,11 @@ pre .c{color:var(--code-dim);}
 .ref{
   display:flex;
   flex-direction:column;
-  gap:.4rem;
+  gap:.35rem;
   background:var(--surface);
   border:1px solid var(--line);
   border-radius:14px;
-  padding:clamp(1.15rem,2.2vw,1.6rem) clamp(1.25rem,2.4vw,1.8rem);
+  padding:clamp(.95rem,1.8vw,1.3rem) clamp(1.15rem,2.2vw,1.6rem);
   box-shadow:var(--shadow);
   text-decoration:none;
   color:inherit;
@@ -263,10 +263,23 @@ pre .c{color:var(--code-dim);}
 .ref:hover,.ref:focus-visible{border-color:var(--accent);transform:translateY(-2px);}
 .ref h2{
   margin:0;
-  font-size:clamp(1.1rem,2vw,1.5rem);
+  font-size:clamp(1.02rem,1.75vw,1.32rem);
   font-weight:700;
   letter-spacing:-.02em;
   text-wrap:balance;
+}
+.tag{
+  display:inline-block;
+  font-family:var(--f-mono);
+  font-size:.63em;
+  font-weight:600;
+  letter-spacing:.04em;
+  color:var(--accent);
+  background:var(--accent-soft);
+  border-radius:6px;
+  padding:.2em .45em;
+  vertical-align:.14em;
+  white-space:nowrap;
 }
 .ref .url{
   font-family:var(--f-mono);
@@ -401,18 +414,23 @@ java -jar pepk.jar \
 
         <div class="refs">
           <a class="ref" href="https://www.youtube.com/watch?v=bViNOUeFuiQ" target="_blank" rel="noopener">
-            <h2>Build the new, modular Android App Bundle</h2>
+            <h2>Build the new, modular Android App Bundle <span class="tag">Google I/O ’18</span></h2>
             <span class="url">youtube.com/watch?v=bViNOUeFuiQ</span>
           </a>
 
-          <a class="ref" href="https://www.slideshare.net/akexorcist/hello-android-studio-32-android-app-bundle-io-extended-bangkok-2018" target="_blank" rel="noopener">
-            <h2>Hello, Android Studio 3.2 &amp; Android App Bundle</h2>
-            <span class="url">slideshare.net/akexorcist/hello-android-studio-32-android-app-bundle-io-extended-bangkok-2018</span>
+          <a class="ref" href="https://www.youtube.com/watch?v=PZBg5DIzNww" target="_blank" rel="noopener">
+            <h2>Build a modular Android app architecture <span class="tag">Google I/O ’19</span></h2>
+            <span class="url">youtube.com/watch?v=PZBg5DIzNww</span>
           </a>
 
-          <a class="ref" href="https://www.slideshare.net/nsface/app-bundle" target="_blank" rel="noopener">
-            <h2>App bundle</h2>
-            <span class="url">slideshare.net/nsface/app-bundle</span>
+          <a class="ref" href="https://www.slideshare.net/chansukyang/droidknight2019" target="_blank" rel="noopener">
+            <h2>구글 플레이 다이나믹 딜리버리 <span class="tag">DroidKnights ’19</span></h2>
+            <span class="url">slideshare.net/chansukyang/droidknight2019</span>
+          </a>
+
+          <a class="ref" href="https://www.slideshare.net/akexorcist/hello-android-studio-32-android-app-bundle-io-extended-bangkok-2018" target="_blank" rel="noopener">
+            <h2>Hello, Android Studio 3.2 &amp; Android App Bundle <span class="tag">I/O Extended ’18</span></h2>
+            <span class="url">slideshare.net/akexorcist/hello-android-studio-32-android-app-bundle-io-extended-bangkok-2018</span>
           </a>
         </div>
       </div>
