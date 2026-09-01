@@ -1,4 +1,4 @@
-# AAB 전환 브리핑
+# app bundle 적용
 
 APK 등록을 Android App Bundle(AAB)로 전환할 때 달라지는 것과 선행 조건을 정리한 3장짜리 발표 자료.
 
