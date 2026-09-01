@@ -242,35 +242,39 @@ pre .c{color:var(--code-dim);}
 .note b{color:var(--warn);}
 
 /* ---------- slide 3 : refs ---------- */
-.refs{display:flex;flex-direction:column;gap:.75rem;}
+.refs{
+  display:flex;flex-direction:column;
+  gap:clamp(.6rem,1.2vw,.9rem);
+  margin-top:clamp(1.4rem,3.2vh,2.4rem);
+}
 .ref{
-  display:grid;
-  grid-template-columns:auto minmax(0,1fr);
-  gap:0 1rem;
-  align-items:start;
+  display:flex;
+  flex-direction:column;
+  gap:.4rem;
   background:var(--surface);
   border:1px solid var(--line);
   border-radius:14px;
-  padding:clamp(.95rem,1.7vw,1.25rem) clamp(1.1rem,2vw,1.4rem);
+  padding:clamp(1.15rem,2.2vw,1.6rem) clamp(1.25rem,2.4vw,1.8rem);
   box-shadow:var(--shadow);
   text-decoration:none;
   color:inherit;
   transition:border-color .18s ease, transform .18s ease;
 }
 .ref:hover,.ref:focus-visible{border-color:var(--accent);transform:translateY(-2px);}
-.rank{
-  font-family:var(--f-mono);font-size:.7rem;font-weight:700;
-  letter-spacing:.08em;
-  color:var(--accent);background:var(--accent-soft);
-  border-radius:6px;padding:.28rem .5rem;
-  grid-row:1 / span 2;
-  margin-top:.15rem;
+.ref h2{
+  margin:0;
+  font-size:clamp(1.1rem,2vw,1.5rem);
+  font-weight:700;
+  letter-spacing:-.02em;
+  text-wrap:balance;
 }
-.ref h2{margin:0;font-size:clamp(1rem,1.6vw,1.2rem);font-weight:700;letter-spacing:-.015em;}
-.ref .meta{font-family:var(--f-mono);font-size:.72rem;color:var(--ink-3);margin-top:.15rem;}
-.ref ul{margin:.6rem 0 0;padding-left:1.05rem;color:var(--ink-2);font-size:.9rem;display:flex;flex-direction:column;gap:.22rem;}
-.ref ul li::marker{color:var(--ink-3);}
-.ref .desc{margin:.35rem 0 0;color:var(--ink-2);font-size:.9rem;}
+.ref .url{
+  font-family:var(--f-mono);
+  font-size:clamp(.72rem,.95vw,.82rem);
+  color:var(--accent);
+  word-break:break-all;
+  line-height:1.5;
+}
 
 /* ---------- chrome ---------- */
 .bar{
@@ -393,41 +397,22 @@ java -jar pepk.jar \
     <!-- ============ 3 ============ -->
     <section class="slide" aria-label="3번 슬라이드">
       <div class="inner">
-        <p class="eyebrow">참고자료</p>
-        <h1>AAB 도입 시점의 원문</h1>
-        <p class="lede">AAB가 처음 공개된 <strong>2018년 5월</strong> 전후 자료. 지금 문서보다 “왜 이렇게 바뀌는가”가 분명하게 설명돼 있다.</p>
+        <h1>참고자료</h1>
 
         <div class="refs">
           <a class="ref" href="https://www.youtube.com/watch?v=bViNOUeFuiQ" target="_blank" rel="noopener">
-            <span class="rank">1순위</span>
-            <div>
-              <h2>Build the new, modular Android App Bundle</h2>
-              <p class="meta">Google I/O ’18 · 공식 세션 영상</p>
-            </div>
-            <ul>
-              <li>.aab 하나만 업로드 → APK 생성·서명은 Play가 수행, multi-APK 관리 불필요</li>
-              <li>전제조건: App Signing by Google Play 등록이 선행되어야 업로드 가능</li>
-              <li><code>./gradlew :module:bundleVariant</code> → <code>build/outputs/bundle/&lt;variant&gt;/*.aab</code></li>
-              <li>bundletool이 Gradle · Studio · Play가 공통으로 쓰는 하부 도구</li>
-            </ul>
+            <h2>Build the new, modular Android App Bundle</h2>
+            <span class="url">youtube.com/watch?v=bViNOUeFuiQ</span>
           </a>
 
           <a class="ref" href="https://www.slideshare.net/akexorcist/hello-android-studio-32-android-app-bundle-io-extended-bangkok-2018" target="_blank" rel="noopener">
-            <span class="rank">슬라이드</span>
-            <div>
-              <h2>Hello, Android Studio 3.2 &amp; Android App Bundle</h2>
-              <p class="meta">I/O Extended Bangkok · 2018.07</p>
-            </div>
-            <p class="desc">빌드 → 서명 → 업로드 흐름을 슬라이드로 훑기 좋다.</p>
+            <h2>Hello, Android Studio 3.2 &amp; Android App Bundle</h2>
+            <span class="url">slideshare.net/akexorcist/hello-android-studio-32-android-app-bundle-io-extended-bangkok-2018</span>
           </a>
 
           <a class="ref" href="https://www.slideshare.net/nsface/app-bundle" target="_blank" rel="noopener">
-            <span class="rank">슬라이드</span>
-            <div>
-              <h2>App bundle</h2>
-              <p class="meta">2018.06</p>
-            </div>
-            <p class="desc">번들 포맷 구조와 Android Studio에서의 빌드·서명 위주.</p>
+            <h2>App bundle</h2>
+            <span class="url">slideshare.net/nsface/app-bundle</span>
           </a>
         </div>
       </div>
