@@ -1,0 +1,507 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AAB 전환 브리핑</title>
+<meta name="description" content="APK 등록을 Android App Bundle로 전환할 때 달라지는 것과 선행 조건">
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+:root{
+  --ground:#eef1f4;
+  --surface:#ffffff;
+  --surface-2:#e4e9ee;
+  --line:#d3dae1;
+  --ink:#1a1f26;
+  --ink-2:#5a6472;
+  --ink-3:#8a93a0;
+  --accent:#0f766e;
+  --accent-soft:#d7ece9;
+  --warn:#b45309;
+  --warn-soft:#f7e6d0;
+  --code-bg:#1a1f26;
+  --code-ink:#dfe5ec;
+  --code-key:#5eead4;
+  --code-dim:#7b8798;
+  --shadow:0 1px 2px rgba(26,31,38,.06), 0 8px 24px -12px rgba(26,31,38,.18);
+
+  --f-display:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --f-mono:ui-monospace,SFMono-Regular,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
+
+  --pad:clamp(1.5rem,4.2vw,4.5rem);
+  --maxw:74rem;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#12161b;
+    --surface:#1a1f26;
+    --surface-2:#222933;
+    --line:#2e3742;
+    --ink:#e6eaf0;
+    --ink-2:#a4afbd;
+    --ink-3:#77828f;
+    --accent:#2dd4bf;
+    --accent-soft:#153733;
+    --warn:#e39a4a;
+    --warn-soft:#3a2c19;
+    --code-bg:#0c0f13;
+    --code-ink:#dfe5ec;
+    --code-key:#5eead4;
+    --code-dim:#6b7686;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 28px -14px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#12161b;
+  --surface:#1a1f26;
+  --surface-2:#222933;
+  --line:#2e3742;
+  --ink:#e6eaf0;
+  --ink-2:#a4afbd;
+  --ink-3:#77828f;
+  --accent:#2dd4bf;
+  --accent-soft:#153733;
+  --warn:#e39a4a;
+  --warn-soft:#3a2c19;
+  --code-bg:#0c0f13;
+  --code-ink:#dfe5ec;
+  --code-key:#5eead4;
+  --code-dim:#6b7686;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 28px -14px rgba(0,0,0,.7);
+}
+
+*{box-sizing:border-box;}
+html,body{height:100%;}
+body{
+  margin:0;
+  background:var(--ground);
+  color:var(--ink);
+  font-family:var(--f-display);
+  font-size:clamp(15px,1.05vw,18px);
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  overflow:hidden;
+}
+
+/* ---------- deck ---------- */
+.deck{
+  position:relative;
+  height:100dvh;
+  display:grid;
+  grid-template-rows:1fr auto;
+}
+.stage{position:relative;overflow:hidden;}
+.slide{
+  position:absolute;
+  inset:0;
+  display:grid;
+  place-items:center;
+  padding:var(--pad);
+  padding-bottom:calc(var(--pad) * .6);
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  opacity:0;
+  visibility:hidden;
+  transform:translateY(12px);
+  transition:opacity .34s ease, transform .34s ease, visibility .34s;
+}
+.slide[data-active="true"]{opacity:1;visibility:visible;transform:none;}
+.inner{width:100%;max-width:var(--maxw);margin:auto;}
+
+/* ---------- shared head ---------- */
+.eyebrow{
+  display:inline-flex;align-items:center;gap:.55rem;
+  font-family:var(--f-mono);
+  font-size:.72rem;
+  letter-spacing:.13em;
+  text-transform:uppercase;
+  color:var(--accent);
+  background:var(--accent-soft);
+  border-radius:999px;
+  padding:.36rem .7rem;
+  margin:0 0 1.1rem;
+}
+h1{
+  font-size:clamp(1.9rem,4.4vw,3.4rem);
+  line-height:1.14;
+  letter-spacing:-.03em;
+  font-weight:800;
+  margin:0 0 .7rem;
+  text-wrap:balance;
+}
+.lede{
+  font-size:clamp(1rem,1.5vw,1.2rem);
+  color:var(--ink-2);
+  margin:0 0 clamp(1.6rem,3.4vh,2.6rem);
+  max-width:56ch;
+  text-wrap:pretty;
+}
+.lede strong{color:var(--ink);font-weight:700;}
+
+/* ---------- slide 1 : change cards ---------- */
+.changes{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,17rem),1fr));
+  gap:clamp(.8rem,1.5vw,1.15rem);
+}
+.card{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:clamp(1.1rem,2vw,1.5rem);
+  box-shadow:var(--shadow);
+  display:flex;
+  flex-direction:column;
+  gap:.6rem;
+}
+.card-tag{
+  font-family:var(--f-mono);
+  font-size:.68rem;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:var(--ink-3);
+}
+.card h2{
+  font-size:clamp(1.15rem,1.9vw,1.45rem);
+  letter-spacing:-.02em;
+  font-weight:750;
+  margin:0;
+}
+.card p{margin:0;color:var(--ink-2);font-size:.95rem;}
+.flow{
+  display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;
+  font-family:var(--f-mono);font-size:.8rem;
+  margin-top:auto;padding-top:.7rem;border-top:1px dashed var(--line);
+}
+.was{color:var(--ink-3);text-decoration:line-through;text-decoration-thickness:1px;}
+.arrow{color:var(--ink-3);}
+.now{color:var(--accent);font-weight:600;}
+.path{
+  font-family:var(--f-mono);font-size:.74rem;color:var(--ink-3);
+  word-break:break-all;line-height:1.5;
+}
+
+/* ---------- slide 2 : steps + code ---------- */
+.split{
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  gap:clamp(1.1rem,2.4vw,2rem);
+}
+@media (min-width:60rem){
+  .split{grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);align-items:start;}
+}
+.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.9rem;counter-reset:s;}
+.steps li{
+  position:relative;
+  padding-left:2.3rem;
+  counter-increment:s;
+  color:var(--ink-2);
+  font-size:.95rem;
+}
+.steps li::before{
+  content:counter(s);
+  position:absolute;left:0;top:.05rem;
+  width:1.6rem;height:1.6rem;
+  display:grid;place-items:center;
+  border-radius:50%;
+  background:var(--accent-soft);
+  color:var(--accent);
+  font-family:var(--f-mono);font-size:.75rem;font-weight:700;
+}
+.steps b{display:block;color:var(--ink);font-weight:700;font-size:1rem;margin-bottom:.1rem;}
+.nav-path{
+  font-family:var(--f-mono);font-size:.78rem;
+  color:var(--ink-2);background:var(--surface-2);
+  border-radius:7px;padding:.15rem .4rem;display:inline-block;
+}
+pre{
+  margin:0;
+  background:var(--code-bg);
+  color:var(--code-ink);
+  border-radius:14px;
+  padding:clamp(1rem,1.8vw,1.35rem);
+  overflow-x:auto;
+  box-shadow:var(--shadow);
+  font-family:var(--f-mono);
+  font-size:clamp(.76rem,1vw,.88rem);
+  line-height:1.75;
+  tab-size:2;
+}
+pre .k{color:var(--code-key);}
+pre .c{color:var(--code-dim);}
+.note{
+  margin-top:1rem;
+  background:var(--warn-soft);
+  border-left:3px solid var(--warn);
+  border-radius:0 10px 10px 0;
+  padding:.85rem 1rem;
+  font-size:.9rem;
+  color:var(--ink);
+}
+.note b{color:var(--warn);}
+
+/* ---------- slide 3 : refs ---------- */
+.refs{display:flex;flex-direction:column;gap:.75rem;}
+.ref{
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr);
+  gap:0 1rem;
+  align-items:start;
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:clamp(.95rem,1.7vw,1.25rem) clamp(1.1rem,2vw,1.4rem);
+  box-shadow:var(--shadow);
+  text-decoration:none;
+  color:inherit;
+  transition:border-color .18s ease, transform .18s ease;
+}
+.ref:hover,.ref:focus-visible{border-color:var(--accent);transform:translateY(-2px);}
+.rank{
+  font-family:var(--f-mono);font-size:.7rem;font-weight:700;
+  letter-spacing:.08em;
+  color:var(--accent);background:var(--accent-soft);
+  border-radius:6px;padding:.28rem .5rem;
+  grid-row:1 / span 2;
+  margin-top:.15rem;
+}
+.ref h2{margin:0;font-size:clamp(1rem,1.6vw,1.2rem);font-weight:700;letter-spacing:-.015em;}
+.ref .meta{font-family:var(--f-mono);font-size:.72rem;color:var(--ink-3);margin-top:.15rem;}
+.ref ul{margin:.6rem 0 0;padding-left:1.05rem;color:var(--ink-2);font-size:.9rem;display:flex;flex-direction:column;gap:.22rem;}
+.ref ul li::marker{color:var(--ink-3);}
+.ref .desc{margin:.35rem 0 0;color:var(--ink-2);font-size:.9rem;}
+
+/* ---------- chrome ---------- */
+.bar{
+  display:flex;align-items:center;justify-content:space-between;gap:1rem;
+  padding:.7rem var(--pad) max(.7rem, env(safe-area-inset-bottom));
+  border-top:1px solid var(--line);
+  background:var(--surface);
+}
+.dots{display:flex;gap:.4rem;}
+.dot{
+  width:2.1rem;height:.28rem;border-radius:999px;
+  background:var(--line);border:0;padding:0;cursor:pointer;
+  transition:background .2s ease;
+}
+.dot[aria-current="true"]{background:var(--accent);}
+.dot:focus-visible{outline:2px solid var(--accent);outline-offset:3px;}
+.bar-right{display:flex;align-items:center;gap:.65rem;}
+.count{font-family:var(--f-mono);font-size:.75rem;color:var(--ink-3);font-variant-numeric:tabular-nums;}
+.btn{
+  width:2rem;height:2rem;display:grid;place-items:center;
+  border:1px solid var(--line);border-radius:8px;
+  background:var(--surface);color:var(--ink-2);
+  cursor:pointer;font-size:.85rem;line-height:1;
+  transition:border-color .18s ease,color .18s ease;
+}
+.btn:hover{border-color:var(--accent);color:var(--accent);}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+.hint{font-family:var(--f-mono);font-size:.72rem;color:var(--ink-3);}
+@media (max-width:44rem){.hint{display:none;}}
+
+@media (prefers-reduced-motion:reduce){
+  .slide{transition:opacity .01s;transform:none;}
+  .ref{transition:none;}
+  .ref:hover,.ref:focus-visible{transform:none;}
+}
+</style>
+</head>
+<body>
+
+<div class="deck">
+  <div class="stage" id="stage">
+
+    <!-- ============ 1 ============ -->
+    <section class="slide" data-active="true" aria-label="1번 슬라이드">
+      <div class="inner">
+        <p class="eyebrow">APK → AAB</p>
+        <h1>등록 방식을 바꾸면<br>무엇이 달라지나</h1>
+        <p class="lede">Play Console에 올리는 파일을 <strong>.apk에서 .aab로</strong> 바꾸면, 최종 APK 생성과 서명을 Play가 대신한다. 개발자 쪽에서 체감되는 변화는 세 가지다.</p>
+
+        <div class="changes">
+          <article class="card">
+            <span class="card-tag">난독화 매핑</span>
+            <h2>mapping.txt</h2>
+            <p>AGP가 빌드 시 매핑 파일을 번들 안에 자동으로 넣는다. 릴리스마다 하던 수동 업로드가 없어진다.</p>
+            <p class="path">BUNDLE-METADATA/<wbr>com.android.tools.build.obfuscation/<wbr>proguard.map</p>
+            <div class="flow"><span class="was">수동 업로드</span><span class="arrow">→</span><span class="now">번들에 자동 포함</span></div>
+          </article>
+
+          <article class="card">
+            <span class="card-tag">모듈 분리</span>
+            <h2>DFM 사용 가능</h2>
+            <p>Dynamic Feature Module은 AAB에서만 동작한다. 사용 빈도가 낮은 기능을 필요할 때 내려받는 on-demand 배포를 쓸 수 있게 된다.</p>
+            <div class="flow"><span class="was">APK는 불가</span><span class="arrow">→</span><span class="now">on-demand 배포</span></div>
+          </article>
+
+          <article class="card">
+            <span class="card-tag">배포 크기</span>
+            <h2>다운로드 용량 감소</h2>
+            <p>Play가 기기별로 필요한 밀도·ABI·언어 리소스만 담은 split APK를 만들어 전달한다. 쓰지 않는 리소스가 빠진다.</p>
+            <div class="flow"><span class="was">universal APK</span><span class="arrow">→</span><span class="now">기기별 split APK</span></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 2 ============ -->
+    <section class="slide" aria-label="2번 슬라이드">
+      <div class="inner">
+        <p class="eyebrow">선행 조건</p>
+        <h1>App Signing 등록</h1>
+        <p class="lede">AAB를 올리려면 App Signing by Google Play 등록이 먼저다. 이때 <strong>기존 키를 앱 서명 키로 직접 올려야</strong> 인증서 지문이 유지된다.</p>
+
+        <div class="split">
+          <ol class="steps">
+            <li>
+              <b>Play Console에서 등록 시작</b>
+              <span class="nav-path">앱 무결성 → 앱 서명</span> 에서 “Java 키 저장소에서 키 내보내기 및 업로드”를 선택한다.
+            </li>
+            <li>
+              <b>pepk.jar 내려받기</b>
+              Console이 pepk.jar와 암호화 공개키를 함께 제공한다.
+            </li>
+            <li>
+              <b>기존 키 추출·암호화</b>
+              오른쪽 명령으로 output.zip을 만든다.
+            </li>
+            <li>
+              <b>output.zip 업로드</b>
+              업로드 키는 같은 키를 그대로 지정할 수 있어 빌드 스크립트를 고치지 않아도 된다.
+            </li>
+          </ol>
+
+          <div>
+<pre><code><span class="c"># 기존 keystore를 앱 서명 키로 등록</span>
+java -jar pepk.jar \
+  <span class="k">--keystore</span>=path/to/upload-key.jks \
+  <span class="k">--alias</span>=&lt;your-key-alias&gt; \
+  <span class="k">--output</span>=output.zip \
+  <span class="k">--include-cert</span> \
+  <span class="k">--rsa-aes-encryption</span> \
+  <span class="k">--encryption-key-path</span>=encryption_public_key.pem</code></pre>
+            <div class="note">
+              <b>주의</b> — Google이 새 키를 생성하게 두면 인증서 지문이 바뀌어, 지문에 묶인 외부 SDK를 모두 재등록해야 한다. 앱 서명 등록은 되돌릴 수 없으므로 기존 키 업로드를 먼저 확인한다.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 3 ============ -->
+    <section class="slide" aria-label="3번 슬라이드">
+      <div class="inner">
+        <p class="eyebrow">참고자료</p>
+        <h1>AAB 도입 시점의 원문</h1>
+        <p class="lede">AAB가 처음 공개된 <strong>2018년 5월</strong> 전후 자료. 지금 문서보다 “왜 이렇게 바뀌는가”가 분명하게 설명돼 있다.</p>
+
+        <div class="refs">
+          <a class="ref" href="https://www.youtube.com/watch?v=bViNOUeFuiQ" target="_blank" rel="noopener">
+            <span class="rank">1순위</span>
+            <div>
+              <h2>Build the new, modular Android App Bundle</h2>
+              <p class="meta">Google I/O ’18 · 공식 세션 영상</p>
+            </div>
+            <ul>
+              <li>.aab 하나만 업로드 → APK 생성·서명은 Play가 수행, multi-APK 관리 불필요</li>
+              <li>전제조건: App Signing by Google Play 등록이 선행되어야 업로드 가능</li>
+              <li><code>./gradlew :module:bundleVariant</code> → <code>build/outputs/bundle/&lt;variant&gt;/*.aab</code></li>
+              <li>bundletool이 Gradle · Studio · Play가 공통으로 쓰는 하부 도구</li>
+            </ul>
+          </a>
+
+          <a class="ref" href="https://www.slideshare.net/akexorcist/hello-android-studio-32-android-app-bundle-io-extended-bangkok-2018" target="_blank" rel="noopener">
+            <span class="rank">슬라이드</span>
+            <div>
+              <h2>Hello, Android Studio 3.2 &amp; Android App Bundle</h2>
+              <p class="meta">I/O Extended Bangkok · 2018.07</p>
+            </div>
+            <p class="desc">빌드 → 서명 → 업로드 흐름을 슬라이드로 훑기 좋다.</p>
+          </a>
+
+          <a class="ref" href="https://www.slideshare.net/nsface/app-bundle" target="_blank" rel="noopener">
+            <span class="rank">슬라이드</span>
+            <div>
+              <h2>App bundle</h2>
+              <p class="meta">2018.06</p>
+            </div>
+            <p class="desc">번들 포맷 구조와 Android Studio에서의 빌드·서명 위주.</p>
+          </a>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <nav class="bar" aria-label="슬라이드 이동">
+    <div class="dots" id="dots"></div>
+    <div class="bar-right">
+      <span class="hint">← → 로 이동</span>
+      <span class="count" id="count">1 / 3</span>
+      <button class="btn" id="prev" type="button" aria-label="이전 슬라이드">←</button>
+      <button class="btn" id="next" type="button" aria-label="다음 슬라이드">→</button>
+      <button class="btn" id="theme" type="button" aria-label="테마 전환">◐</button>
+    </div>
+  </nav>
+</div>
+
+<script>
+(function(){
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var dotsEl = document.getElementById('dots');
+  var countEl = document.getElementById('count');
+  var i = 0;
+
+  slides.forEach(function(_, n){
+    var b = document.createElement('button');
+    b.className = 'dot';
+    b.type = 'button';
+    b.setAttribute('aria-label', (n + 1) + '번 슬라이드로 이동');
+    b.addEventListener('click', function(){ go(n); });
+    dotsEl.appendChild(b);
+  });
+  var dots = Array.prototype.slice.call(dotsEl.children);
+
+  function go(n){
+    i = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach(function(s, k){ s.dataset.active = (k === i) ? 'true' : 'false'; });
+    dots.forEach(function(d, k){ d.setAttribute('aria-current', (k === i) ? 'true' : 'false'); });
+    countEl.textContent = (i + 1) + ' / ' + slides.length;
+    if (location.hash !== '#' + (i + 1)) history.replaceState(null, '', '#' + (i + 1));
+  }
+
+  document.getElementById('prev').addEventListener('click', function(){ go(i - 1); });
+  document.getElementById('next').addEventListener('click', function(){ go(i + 1); });
+
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); go(i + 1); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); go(i - 1); }
+    else if (e.key === 'Home') { e.preventDefault(); go(0); }
+    else if (e.key === 'End') { e.preventDefault(); go(slides.length - 1); }
+  });
+
+  var x0 = null;
+  document.getElementById('stage').addEventListener('touchstart', function(e){ x0 = e.touches[0].clientX; }, {passive:true});
+  document.getElementById('stage').addEventListener('touchend', function(e){
+    if (x0 === null) return;
+    var dx = e.changedTouches[0].clientX - x0;
+    if (Math.abs(dx) > 60) go(dx < 0 ? i + 1 : i - 1);
+    x0 = null;
+  }, {passive:true});
+
+  var themeBtn = document.getElementById('theme');
+  themeBtn.addEventListener('click', function(){
+    var cur = document.documentElement.getAttribute('data-theme');
+    var isDark = cur ? cur === 'dark'
+      : window.matchMedia('(prefers-color-scheme: dark)').matches;
+    document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  });
+
+  var start = parseInt((location.hash || '').replace('#', ''), 10);
+  go(isNaN(start) ? 0 : start - 1);
+})();
+</script>
+</body>
+</html>
